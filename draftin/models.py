@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.core.urlresolvers import reverse
 
 class Collection(models.Model):
     content_type = models.ForeignKey(ContentType, blank=True, null=True)
@@ -20,9 +21,8 @@ class Collection(models.Model):
             self.uuid = str(uuid.uuid4())
         return super(Collection, self).save(*args, **kwargs)
 
-    @models.permalink
     def get_absolute_url(self):
-        pass
+        return reverse("draftin.endpoint", kwargs={"uuid": self.uuid})
 
 
 class Draft(models.Model):
