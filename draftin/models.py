@@ -6,6 +6,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 
 class Collection(models.Model):
+    """
+    Webhook for Draft, which can be attached to another
+    kind of content like a site or a blog.
+    """
     content_type = models.ForeignKey(ContentType, blank=True, null=True)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     parent = generic.GenericForeignKey('content_type', 'object_id')
@@ -27,6 +31,8 @@ class Collection(models.Model):
 
 
 class Draft(models.Model):
+    """Article content provided by Draft."""
+
     collection = models.ForeignKey(Collection)
     draft_id = models.IntegerField()
     name = models.CharField(max_length=512)
@@ -40,7 +46,12 @@ class Draft(models.Model):
     published = models.BooleanField(default=False)
     date_published = models.DateTimeField(blank=True, null=True)
 
+    def __unicode__(self):
+        return self.name or self.draft_id
+
     def save(self, *args, **kwargs):
         if self.published and not self.date_published:
             self.date_published = datetime.datetime.now()
         return super(Draft, self).save(*args, **kwargs)
+
+
