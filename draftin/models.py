@@ -1,4 +1,5 @@
 import uuid
+import datetime
 from django.db import models
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
@@ -37,3 +38,9 @@ class Draft(models.Model):
     updated_at = models.DateTimeField()
     last_synced_at = models.DateTimeField(auto_now=True)
     published = models.BooleanField(default=False)
+    date_published = models.DateTimeField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.published and not self.date_published:
+            self.date_published = datetime.datetime.now()
+        return super(Draft, self).save(*args, **kwargs)
