@@ -1,7 +1,7 @@
 import uuid
 import datetime
 from django.db import models
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 
@@ -12,7 +12,7 @@ class Collection(models.Model):
     """
     content_type = models.ForeignKey(ContentType, blank=True, null=True)
     object_id = models.PositiveIntegerField(blank=True, null=True)
-    parent = generic.GenericForeignKey('content_type', 'object_id')
+    parent = GenericForeignKey('content_type', 'object_id')
     uuid = models.CharField(max_length=255, editable=False)
     auto_publish = models.BooleanField(default=True)
 
