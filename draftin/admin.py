@@ -5,7 +5,7 @@ from .models import Draft, Collection
 
 class CollectionAdmin(admin.ModelAdmin):
     model = Collection
-    list_display = ['uuid', 'parent', 'auto_publish', "drafts", "webhook"]
+    list_display = ['name','uuid', 'parent', 'auto_publish', "drafts", "webhook"]
 
     def drafts(self, instance=None):
         if instance:
