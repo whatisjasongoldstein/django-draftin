@@ -1,4 +1,6 @@
 import json
+import thread
+
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -54,6 +56,9 @@ def endpoint(request, uuid):
         for key, value in parameters.items():
             setattr(draft, key, value)
         draft.save()
+
+    if "https://draftin.com:443/images/" in draft.content:
+        thread.start_new_thread(draft.download_images, ())
 
     return HttpResponse("Thanks!")
 

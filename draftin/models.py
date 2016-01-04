@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import uuid
 import datetime
 from django.db import models
@@ -5,6 +7,9 @@ from django.utils.text import slugify
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
+
+from .settings import DRAFTIN_SETTINGS
+
 
 class Collection(models.Model):
     """
@@ -69,4 +74,44 @@ class Draft(models.Model):
             self.date_published = datetime.datetime.now()
         return super(Draft, self).save(*args, **kwargs)
 
+    def download_images(self):
+        tree = lxml.html.fragment_fromstring(self.content_html, create_parent="div")
+        images = tree.xpath("//img[@src]")
+        for img in images:
+            src = img.attrib["src"]
+            if src.startswith(settings.MEDIA_URL):
+                continue  # Don't repeat
+
+            try:
+                resp = requests.get(src)
+            except requests.exceptions.MissingSchema:
+                continue
+
+            filename = resp.headers.get("x-file-name")
+            directory = os.path.join("draftin/img", str(self.id))
+            
+            file_path = os.path.join(settings.MEDIA_ROOT, directory, filename)
+            file_url = "/".join([settings.MEDIA_URL, directory, filename])
+
+            # Update the content
+            self.content = self.content.replace(src, file_url)
+            self.content_html = self.content_html.replace(src, file_url)
+
+            # If this item exists, skip it
+            if os.path.exists(file_path):
+                continue
+
+            # Download the file
+            directory = os.path.join(settings.MEDIA_ROOT, directory)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            with open(file_path, "wb") as f:
+                f.write(resp.content)
+                f.close()
+
+            # Resize image
+            resize_image(file_path, DRAFTIN_SETTINGS["MAX_IMAGE_SIZE"])
+
+        self.save()
 
