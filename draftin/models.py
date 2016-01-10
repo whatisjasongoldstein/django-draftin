@@ -1,8 +1,12 @@
 from __future__ import absolute_import
 
-import lxml
+import os
+import lxml.html
 import uuid
 import datetime
+import requests
+from PIL import Image
+
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -11,6 +15,16 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 
 from .settings import DRAFTIN_SETTINGS
+
+
+def resize_image(path, size):
+    """
+    Limits image (path) to the dimensions passed as [w,h]
+    """
+    im = Image.open(path)
+    if im.size[0] > size[0] or im.size[1] > size[1]:
+        im.thumbnail(size, resample=Image.ANTIALIAS)
+        im.save(path)
 
 
 class Collection(models.Model):
