@@ -53,7 +53,7 @@ class Draft(models.Model):
     draftin_user_id = models.IntegerField(blank=True, null=True)
     draftin_user_email = models.EmailField()
     created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
+    updated_at = models.DateTimeField(auto_now=True)
     last_synced_at = models.DateTimeField(auto_now=True)
     published = models.BooleanField(default=False)
     date_published = models.DateTimeField(blank=True, null=True)
@@ -112,6 +112,5 @@ class Draft(models.Model):
 
             # Resize image
             resize_image(file_path, DRAFTIN_SETTINGS["MAX_IMAGE_SIZE"])
-
         self.save()
 
