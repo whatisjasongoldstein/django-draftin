@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import lxml
 import uuid
 import datetime
 from django.db import models
@@ -7,6 +8,7 @@ from django.utils.text import slugify
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from .settings import DRAFTIN_SETTINGS
 
