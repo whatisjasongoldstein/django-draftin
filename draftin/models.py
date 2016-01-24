@@ -83,6 +83,10 @@ class Draft(models.Model):
     def clean(self, *args, **kwargs):
         if not self.draft_id and not self.external_url:
             raise ValidationError("A Draft ID or External URL is required.")
+        
+        if self.external_url:
+            self.download_content()
+
         return super(Draft, self).clean(*args, **kwargs)            
 
     def save(self, *args, **kwargs):
@@ -98,17 +102,14 @@ class Draft(models.Model):
         if self.published and not self.date_published:
             self.date_published = datetime.datetime.now()
 
-        if self.external_url:
-            self.download_content()
-
         return super(Draft, self).save(*args, **kwargs)
 
     def download_content(self):
         url = self.external_url
         if url.startswith("https://www.dropbox.com"):
             url = url.replace("https://www.dropbox.com", "https://dl.dropbox.com", 1)
-        resp = requests.get(url)
         try:
+            resp = requests.get(url)
             resp.raise_for_status()
         except Exception as e:
             raise ValidationError("External url failed to scrape.")
