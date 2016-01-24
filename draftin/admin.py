@@ -25,6 +25,11 @@ class DraftAdmin(admin.ModelAdmin):
     list_filter = ["published", "collection"]
     ordering = ["-updated_at", ]
 
+    def save_model(self, request, obj, form, change):
+        if not obj.draftin_user_email:
+            obj.draftin_user_email = request.user.email
+        super(DraftAdmin, self).save_model(request, obj, form, change)
+
 
 admin.site.register(Draft, DraftAdmin)
 admin.site.register(Collection, CollectionAdmin)

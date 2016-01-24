@@ -5,6 +5,7 @@ import lxml.html
 import uuid
 import datetime
 import requests
+import markdown
 from PIL import Image
 
 from django.db import models
@@ -13,6 +14,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from .settings import DRAFTIN_SETTINGS
 
@@ -61,14 +63,15 @@ class Draft(models.Model):
     """Article content provided by Draft."""
 
     collection = models.ForeignKey(Collection)
-    draft_id = models.IntegerField()
-    name = models.CharField(max_length=512)
+    draft_id = models.IntegerField(blank=True, null=True)
+    external_url = models.URLField(blank=True, default="")
+    name = models.CharField("Title", max_length=512)
     slug = models.CharField(max_length=255, default="", blank=True, unique=True)
-    content = models.TextField()
-    content_html = models.TextField()
+    content = models.TextField(default="", blank=True)
+    content_html = models.TextField(default="", blank=True)
     draftin_user_id = models.IntegerField(blank=True, null=True)
-    draftin_user_email = models.EmailField()
-    created_at = models.DateTimeField()
+    draftin_user_email = models.EmailField(blank=True)
+    created_at = models.DateTimeField(default=datetime.datetime.now)
     updated_at = models.DateTimeField(auto_now=True)
     last_synced_at = models.DateTimeField(auto_now=True)
     published = models.BooleanField(default=False)
@@ -77,7 +80,13 @@ class Draft(models.Model):
     def __unicode__(self):
         return self.name or self.draft_id
 
+    def clean(self, *args, **kwargs):
+        if not self.draft_id and not self.external_url:
+            raise ValidationError("A Draft ID or External URL is required.")
+        return super(Draft, self).clean(*args, **kwargs)            
+
     def save(self, *args, **kwargs):
+
         # Ensure a unique slug
         if not self.slug:
             proposed_slug = slugify(self.name)
@@ -88,7 +97,23 @@ class Draft(models.Model):
         # Set date published
         if self.published and not self.date_published:
             self.date_published = datetime.datetime.now()
+
+        if self.external_url:
+            self.download_content()
+
         return super(Draft, self).save(*args, **kwargs)
+
+    def download_content(self):
+        url = self.external_url
+        if url.startswith("https://www.dropbox.com"):
+            url = url.replace("https://www.dropbox.com", "https://dl.dropbox.com", 1)
+        resp = requests.get(url)
+        try:
+            resp.raise_for_status()
+        except Exception as e:
+            raise ValidationError("External url failed to scrape.")
+        self.content = resp.text
+        self.content_html = markdown.markdown(resp.text)
 
     def download_images(self):
         tree = lxml.html.fragment_fromstring(self.content_html, create_parent="div")
