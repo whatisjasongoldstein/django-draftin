@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
     name='Django Draftin',
-    version="1.0.0",
+    version="1.1.0",
     author='Jason Goldstein',
     author_email='jason@betheshoe.com',
     url='https://bitbucket.org/whatisjasongoldstein/django-draftin',
