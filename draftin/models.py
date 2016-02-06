@@ -6,6 +6,8 @@ import uuid
 import datetime
 import requests
 import markdown
+import hashlib
+import urlparse
 from PIL import Image
 
 from django.db import models
@@ -86,11 +88,9 @@ class Draft(models.Model):
         
         if self.external_url:
             self.download_content()
-
         return super(Draft, self).clean(*args, **kwargs)            
 
     def save(self, *args, **kwargs):
-
         # Ensure a unique slug
         if not self.slug:
             proposed_slug = slugify(self.name)
@@ -115,6 +115,7 @@ class Draft(models.Model):
             raise ValidationError("External url failed to scrape.")
         self.content = resp.text
         self.content_html = markdown.markdown(resp.text)
+        self.download_images()
 
     def download_images(self):
         tree = lxml.html.fragment_fromstring(self.content_html, create_parent="div")
@@ -130,14 +131,17 @@ class Draft(models.Model):
                 continue
 
             filename = resp.headers.get("x-file-name")
+            if not filename:  # Build from the src if its not in the header
+                filename = "%s.jpg" % hashlib.md5(urlparse.urlparse(src).path).hexdigest()
+
             directory = os.path.join("draftin/img", str(self.id))
             
             file_path = os.path.join(settings.MEDIA_ROOT, directory, filename)
-            file_url = "/".join([settings.MEDIA_URL, directory, filename])
+            file_url = os.path.join(settings.MEDIA_URL, directory, filename)
 
             # Update the content
             self.content = self.content.replace(src, file_url)
-            self.content_html = self.content_html.replace(src, file_url)
+            img.attrib["src"] = file_url
 
             # If this item exists, skip it
             if os.path.exists(file_path):
@@ -154,5 +158,7 @@ class Draft(models.Model):
 
             # Resize image
             resize_image(file_path, DRAFTIN_SETTINGS["MAX_IMAGE_SIZE"])
+
+        self.content_html = lxml.html.tostring(tree)
         self.save()
 
