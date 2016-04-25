@@ -114,7 +114,8 @@ class Draft(models.Model):
         except Exception as e:
             raise ValidationError("External url failed to scrape.")
         self.content = resp.text
-        self.content_html = markdown.markdown(resp.text)
+        self.content_html = markdown.markdown(resp.text,
+            extensions=['markdown.extensions.fenced_code', 'markdown.extensions.footnotes'])
         self.download_images()
 
     def download_images(self):
