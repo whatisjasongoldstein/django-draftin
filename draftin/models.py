@@ -12,6 +12,7 @@ from PIL import Image
 
 from django.db import models
 from django.utils.text import slugify
+from django.utils.functional import cached_property
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
@@ -81,6 +82,10 @@ class Draft(models.Model):
 
     def __unicode__(self):
         return self.name or self.draft_id
+
+    @cached_property
+    def wordcount(self):
+        return len(filter(None, self.content.split(" ")))
 
     def clean(self, *args, **kwargs):
         if not self.draft_id and not self.external_url:
