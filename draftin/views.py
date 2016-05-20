@@ -1,5 +1,9 @@
 import json
-import thread
+
+try:
+    import thread
+except ImportError:
+    import _thread as thread
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404

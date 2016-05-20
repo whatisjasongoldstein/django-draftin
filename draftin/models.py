@@ -7,7 +7,11 @@ import datetime
 import requests
 import markdown
 import hashlib
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    from urllib import parse as urlparse
+
 from PIL import Image
 
 from django.db import models
