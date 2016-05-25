@@ -89,7 +89,7 @@ class Draft(models.Model):
 
     @cached_property
     def wordcount(self):
-        return len(filter(None, self.content.split(" ")))
+        return len(list(filter(None, self.content.split(" "))))
 
     def clean(self, *args, **kwargs):
         if not self.draft_id and not self.external_url:
