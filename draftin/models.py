@@ -15,6 +15,7 @@ except ImportError:
 from PIL import Image
 
 from django.db import models
+from django.utils.html import strip_tags
 from django.utils.text import slugify
 from django.utils.functional import cached_property
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -89,7 +90,8 @@ class Draft(models.Model):
 
     @cached_property
     def wordcount(self):
-        return len(list(filter(None, self.content.split(" "))))
+        text = strip_tags(self.content_html) or self.content
+        return len(list(filter(None, text.split(" "))))
 
     def clean(self, *args, **kwargs):
         if not self.draft_id and not self.external_url:
