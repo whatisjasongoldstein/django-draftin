@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import os
 import lxml.html
@@ -23,6 +23,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.utils.encoding import python_2_unicode_compatible
 
 from .settings import DRAFTIN_SETTINGS
 
@@ -37,6 +38,7 @@ def resize_image(path, size):
         im.save(path)
 
 
+@python_2_unicode_compatible
 class Collection(models.Model):
     """
     Webhook for Draft, which can be attached to another
@@ -49,7 +51,7 @@ class Collection(models.Model):
     uuid = models.CharField(max_length=255, editable=False)
     auto_publish = models.BooleanField(default=True)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.name:
             return self.name
         elif self.parent and self.uuid:
@@ -67,6 +69,7 @@ class Collection(models.Model):
         return reverse("draftin.endpoint", kwargs={"uuid": self.uuid})
 
 
+@python_2_unicode_compatible
 class Draft(models.Model):
     """Article content provided by Draft."""
 
@@ -85,7 +88,7 @@ class Draft(models.Model):
     published = models.BooleanField(default=False)
     date_published = models.DateTimeField(blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name or self.draft_id
 
     @cached_property
