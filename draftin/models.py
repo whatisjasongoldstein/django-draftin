@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+import re
 import os
 import lxml.html
 import uuid
@@ -25,7 +26,12 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.encoding import python_2_unicode_compatible
 
+from .helpers import gist_to_markdown
 from .settings import DRAFTIN_SETTINGS
+
+
+GIST_RE = re.compile(r'\<script src="https:\/\/gist\.github.com\/[\w]+\/([\w]+)\.js"\>\<\/script\>',
+re.UNICODE)
 
 
 def resize_image(path, size):
@@ -120,6 +126,8 @@ class Draft(models.Model):
 
     def download_content(self):
         url = self.external_url
+
+        # Scrape markdown files from Dropbox
         if url.startswith("https://www.dropbox.com"):
             url = url.replace("https://www.dropbox.com", "https://dl.dropbox.com", 1)
         try:
@@ -128,8 +136,18 @@ class Draft(models.Model):
         except Exception as e:
             raise ValidationError("External url failed to scrape.")
         self.content = resp.text
-        self.content_html = markdown.markdown(resp.text,
-            extensions=['markdown.extensions.fenced_code', 'markdown.extensions.footnotes'])
+
+        # If any code is embedded as a gist, download those
+        self.download_gists()
+
+        # Make html
+        self.content_html = markdown.markdown(self.content,
+            extensions=[
+                'markdown.extensions.fenced_code',
+                'markdown.extensions.footnotes',
+            ])
+
+        # Scrape images
         self.download_images()
 
     def download_images(self):
@@ -175,5 +193,16 @@ class Draft(models.Model):
             resize_image(file_path, DRAFTIN_SETTINGS["MAX_IMAGE_SIZE"])
 
         self.content_html = lxml.html.tostring(tree)
-        self.save()
+
+    def download_gists(self):
+        """
+        If the post contains embedded gists, convert
+        them to markdown fenced code and contain them
+        in the contents.
+        """
+        matches = re.finditer(GIST_RE, self.content)
+        for match in matches:
+            md_gist = gist_to_markdown(match.groups()[0])
+            if md_gist:
+                self.content = self.content.replace(match.group(), md_gist)
 
