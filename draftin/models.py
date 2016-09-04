@@ -76,12 +76,27 @@ class Collection(models.Model):
 
 
 @python_2_unicode_compatible
+class Publication(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    slug = models.SlugField(max_length=255, default="", blank=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super(Publication, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
 class Draft(models.Model):
     """Article content provided by Draft."""
 
     collection = models.ForeignKey(Collection)
     draft_id = models.IntegerField(blank=True, null=True)
     external_url = models.URLField(blank=True, default="")
+    publication = models.ForeignKey(Publication, blank=True, null=True,
+        verbose_name="External Publication")
     name = models.CharField("Title", max_length=512)
     slug = models.CharField(max_length=255, default="", blank=True, unique=True)
     content = models.TextField(default="", blank=True)
@@ -102,11 +117,19 @@ class Draft(models.Model):
         text = strip_tags(self.content_html) or self.content
         return len(list(filter(None, text.split(" "))))
 
+    @cached_property
+    def domain(self):
+        if self.external_url:
+            return urlparse.urlparse(self.external_url).netloc
+
     def clean(self, *args, **kwargs):
         if not self.draft_id and not self.external_url:
             raise ValidationError("A Draft ID or External URL is required.")
+
+        if self.publication and not self.external_url:
+            raise ValidationError("External publications need a url to link to.")
         
-        if self.external_url:
+        if self.external_url and not self.publication:
             self.download_content()
         return super(Draft, self).clean(*args, **kwargs)            
 
@@ -165,7 +188,7 @@ class Draft(models.Model):
 
             filename = resp.headers.get("x-file-name")
             if not filename:  # Build from the src if its not in the header
-                filename = "%s.jpg" % hashlib.md5(urlparse.urlparse(src).path).hexdigest()
+                filename = "%s.jpg" % hashlib.md5(urlparse.urlparse(src).path.encode("utf-8")).hexdigest()
 
             directory = os.path.join("draftin/img", str(self.id))
             

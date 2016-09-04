@@ -1,5 +1,7 @@
 DraftIn integration for Django.
 
+It can also scrape Markdown from other urls.
+
 ### Basic Setup
 
 1. Add `draftin` to installed apps
