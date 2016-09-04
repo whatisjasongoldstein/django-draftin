@@ -28,7 +28,8 @@ class PublicationAdmin(admin.ModelAdmin):
 @admin.register(Draft)
 class DraftAdmin(admin.ModelAdmin):
     model = Draft
-    list_display = ["name", "collection", "created_at", "updated_at", "published",]
+    list_display = ["name", "origin", "collection", 
+        "created_at", "updated_at", "published",]
     list_filter = ["published", "collection"]
     ordering = ["-updated_at", ]
     readonly_fields = ["content", "content_html", 
@@ -45,8 +46,9 @@ class DraftAdmin(admin.ModelAdmin):
             "fields": ("origin", "external_url", "publication", )
         }),
 
-        ("Content", {
+        ("Content (Debug)", {
             "fields": ("content", "content_html", ),
+            'classes': ('collapse',),
         }),
     )
 
