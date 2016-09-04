@@ -31,6 +31,33 @@ class DraftAdmin(admin.ModelAdmin):
     list_display = ["name", "collection", "created_at", "updated_at", "published",]
     list_filter = ["published", "collection"]
     ordering = ["-updated_at", ]
+    readonly_fields = ["content", "content_html", 
+        "draftin_user_id", "draftin_user_email", "origin"]
+    fieldsets = (
+        ("Metadata", {
+            "fields": ("name", "slug", 
+                "collection",
+                ("date_published", "published", ),
+            ),
+        }),
+
+        ("Source", {
+            "fields": ("origin", "external_url", "publication", )
+        }),
+
+        ("Content", {
+            "fields": ("content", "content_html", ),
+        }),
+    )
+
+    def origin(self, instance):
+        if instance.draft_id:
+            return "Draftin"
+        elif instance.external_url and instance.publication:
+            return "External Link"
+        elif instance.external_url:
+            return "Markdown scrape"
+        return "Unknown"
 
     def save_model(self, request, obj, form, change):
         if not obj.draftin_user_email:

@@ -93,7 +93,7 @@ class Draft(models.Model):
     """Article content provided by Draft."""
 
     collection = models.ForeignKey(Collection)
-    draft_id = models.IntegerField(blank=True, null=True)
+    draft_id = models.IntegerField(blank=True, null=True, editable=False)
     external_url = models.URLField(blank=True, default="")
     publication = models.ForeignKey(Publication, blank=True, null=True,
         verbose_name="External Publication")
@@ -103,7 +103,7 @@ class Draft(models.Model):
     content_html = models.TextField(default="", blank=True)
     draftin_user_id = models.IntegerField(blank=True, null=True)
     draftin_user_email = models.EmailField(blank=True)
-    created_at = models.DateTimeField(default=datetime.datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
     last_synced_at = models.DateTimeField(auto_now=True)
     published = models.BooleanField(default=False)
