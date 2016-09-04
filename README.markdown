@@ -1,6 +1,11 @@
-DraftIn integration for Django.
+A simple writing toolkit for Django. It can receive posts
+from [Draftin](https://draftin.com/), scrape Markdown (from Dropbox),
+or link to external posts on other blogs.
 
-It can also scrape Markdown from other urls.
+Made to be extended.
+
+**Todo:** many features, including image and gist scraping, are poorly
+documenting. That could use some work.
 
 ### Basic Setup
 
@@ -31,6 +36,13 @@ class Post(models.Model):
     author = models.ForeignKey(...)
     image = models.ImageField(...)
 
+    def get_absolute_url(self):
+        """
+        The default model has no opinion on how it
+        should appear on the front-end. The child model
+        should decide.
+        """
+        return reverse(...)
 
 def create_posts_with_drafts(**kwargs):
     """
