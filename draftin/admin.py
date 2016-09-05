@@ -43,7 +43,7 @@ class DraftAdmin(admin.ModelAdmin):
         }),
 
         ("Source", {
-            "fields": ("origin", "external_url", "publication", )
+            "fields": ("origin", "external_url", "publication", "canonical_url", )
         }),
 
         ("Content (Debug)", {

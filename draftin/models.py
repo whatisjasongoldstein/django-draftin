@@ -97,6 +97,7 @@ class Draft(models.Model):
     external_url = models.URLField(blank=True, default="")
     publication = models.ForeignKey(Publication, blank=True, null=True,
         verbose_name="External Publication")
+    canonical_url = models.URLField(blank=True, default="")
     name = models.CharField("Title", max_length=512)
     slug = models.CharField(max_length=255, default="", blank=True, unique=True)
     content = models.TextField(default="", blank=True)
@@ -119,17 +120,16 @@ class Draft(models.Model):
 
     @cached_property
     def domain(self):
-        if self.external_url:
-            return urlparse.urlparse(self.external_url).netloc
+        url = self.canonical_url or self.external_url
+        if url:
+            return urlparse.urlparse(url).netloc
+        return None
 
     def clean(self, *args, **kwargs):
         if not self.draft_id and not self.external_url:
             raise ValidationError("A Draft ID or External URL is required.")
 
-        if self.publication and not self.external_url:
-            raise ValidationError("External publications need a url to link to.")
-        
-        if self.external_url and not self.publication:
+        if self.external_url:
             self.download_content()
         return super(Draft, self).clean(*args, **kwargs)            
 
