@@ -36,7 +36,8 @@ class DraftAdmin(admin.ModelAdmin):
         "draftin_user_id", "draftin_user_email", "origin"]
     fieldsets = (
         ("Metadata", {
-            "fields": ("name", "slug", 
+            "fields": ("name", "slug",
+                "description",
                 "collection",
                 ("date_published", "published", ),
             ),

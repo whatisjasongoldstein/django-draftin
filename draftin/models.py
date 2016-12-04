@@ -99,6 +99,7 @@ class Draft(models.Model):
         verbose_name="External Publication")
     canonical_url = models.URLField(blank=True, default="")
     name = models.CharField("Title", max_length=512)
+    description = models.TextField(blank=True, default="", help_text="Optional dek.")
     slug = models.CharField(max_length=255, default="", blank=True, unique=True)
     content = models.TextField(default="", blank=True)
     content_html = models.TextField(default="", blank=True)
