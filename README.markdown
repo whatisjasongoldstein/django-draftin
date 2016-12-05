@@ -1,11 +1,17 @@
 A simple writing toolkit for Django. It can receive posts
-from [Draftin](https://draftin.com/), scrape Markdown (from Dropbox),
-or link to external posts on other blogs.
+from [Draftin](https://draftin.com/), scrape Markdown (from something
+like Dropbox), or link to external posts on other blogs.
 
-Made to be extended.
+### Philosophy
 
-**Todo:** many features, including image and gist scraping, are poorly
-documenting. That could use some work.
+1. A CMS is no place for writing. That's why so many writers copy
+   paste from their tool of choice.
+2. Markdown is pretty great.
+3. There are many ways to put writing on the web. This one is mine.
+   It doesn't need to aspire to be all things to all people, or
+   to any people, for that matter.
+4. When in doubt, inline content. Images are scraped. Gists are converted
+   into fenced code blocks. 
 
 ### Basic Setup
 
@@ -16,8 +22,7 @@ documenting. That could use some work.
    ```
    in `urls.py`
 
-
-### Extending
+### Extending Models
 
 I want to keep this lean, but most article apps will need images
 and metadata. On [Be The Shoe](http://betheshoe.com), I do something

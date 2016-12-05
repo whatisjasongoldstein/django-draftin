@@ -6,9 +6,9 @@ setup(
     version="1.1.0",
     author='Jason Goldstein',
     author_email='jason@betheshoe.com',
-    url='https://bitbucket.org/whatisjasongoldstein/django-draftin',
+    url='https://www.github.com/whatisjasongoldstein/django-draftin',
     packages=find_packages(),
     include_package_data=True,
-    description='Writing with Draftin.com.',
+    description='Why write in a CMS?',
     long_description=open('README.markdown').read(),
 )

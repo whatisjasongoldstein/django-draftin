@@ -137,10 +137,10 @@ class Draft(models.Model):
     def save(self, *args, **kwargs):
         # Ensure a unique slug
         if not self.slug:
-            proposed_slug = slugify(self.name)
+            proposed_slug = slugify(self.name)[:255]
             if Draft.objects.filter(slug=proposed_slug).count():
                 proposed_slug = "%s-%s" % (proposed_slug, uuid.uuid4())
-            self.slug = proposed_slug[:255]
+            self.slug = proposed_slug
         
         # Set date published
         if self.published and not self.date_published:
