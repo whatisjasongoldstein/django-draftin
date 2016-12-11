@@ -38,7 +38,11 @@ def resize_image(path, size):
     """
     Limits image (path) to the dimensions passed as [w,h]
     """
-    im = Image.open(path)
+    try:
+        im = Image.open(path)
+    except Exception:
+        return
+
     if im.size[0] > size[0] or im.size[1] > size[1]:
         im.thumbnail(size, resample=Image.ANTIALIAS)
         im.save(path)
