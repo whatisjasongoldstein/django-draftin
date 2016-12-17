@@ -94,8 +94,6 @@ class Publication(models.Model):
 
 @python_2_unicode_compatible
 class Draft(models.Model):
-    """Article content provided by Draft."""
-
     collection = models.ForeignKey(Collection)
     draft_id = models.IntegerField(blank=True, null=True, editable=False)
     external_url = models.URLField(blank=True, default="")
@@ -104,6 +102,7 @@ class Draft(models.Model):
     canonical_url = models.URLField(blank=True, default="")
     name = models.CharField("Title", max_length=512)
     description = models.TextField(blank=True, default="", help_text="Optional dek.")
+    image = models.ImageField(upload_to="draftin/img/%Y/%m/", blank=True, default="")
     slug = models.CharField(max_length=255, default="", blank=True, unique=True)
     content = models.TextField(default="", blank=True)
     content_html = models.TextField(default="", blank=True)
