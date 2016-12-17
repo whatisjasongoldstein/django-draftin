@@ -38,6 +38,7 @@ class DraftAdmin(admin.ModelAdmin):
         ("Metadata", {
             "fields": ("name", "slug",
                 "description",
+                "image",
                 "collection",
                 ("date_published", "published", ),
             ),
