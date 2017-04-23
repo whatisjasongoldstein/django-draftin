@@ -26,7 +26,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.encoding import python_2_unicode_compatible
 
-from .helpers import gist_to_markdown
+from .helpers import gist_to_markdown, dropbox_url
 from .settings import DRAFTIN_SETTINGS
 
 
@@ -152,9 +152,9 @@ class Draft(models.Model):
         return super(Draft, self).save(*args, **kwargs)
 
     def download_content(self):
-        url = self.external_url
 
         # Scrape markdown files from Dropbox
+        url = dropbox_url(self.external_url)
         if url.startswith("https://www.dropbox.com"):
             url = url.replace("https://www.dropbox.com", "https://dl.dropbox.com", 1)
         try:
@@ -181,7 +181,7 @@ class Draft(models.Model):
         tree = lxml.html.fragment_fromstring(self.content_html, create_parent="div")
         images = tree.xpath("//img[@src]")
         for img in images:
-            src = img.attrib["src"]
+            src = dropbox_url(img.attrib["src"])
             if src.startswith(settings.MEDIA_URL):
                 continue  # Don't repeat
 
@@ -204,7 +204,7 @@ class Draft(models.Model):
             img.attrib["src"] = file_url
 
             # If this item exists, skip it
-            if os.path.exists(file_path):
+            if os.path.exists(file_path) and os.path.getsize(file_path):
                 continue
 
             # Download the file

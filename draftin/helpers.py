@@ -25,3 +25,12 @@ def gist_to_markdown(gist_id):
         }
         markdown_reps.append(md)
     return "\n\n".join(markdown_reps)
+
+
+def dropbox_url(url):
+    """
+    Convert dropbox share url to a file url
+    """
+    if url.startswith("https://www.dropbox.com"):
+        url = url.replace("https://www.dropbox.com", "https://dl.dropbox.com", 1)
+    return url
