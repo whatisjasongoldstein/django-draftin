@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('object_id', models.PositiveIntegerField(null=True, blank=True)),
                 ('uuid', models.CharField(max_length=255)),
-                ('content_type', models.ForeignKey(blank=True, to='contenttypes.ContentType', null=True)),
+                ('content_type', models.ForeignKey(blank=True, to='contenttypes.ContentType', null=True, on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField()),
                 ('updated_at', models.DateTimeField()),
                 ('last_synced_at', models.DateTimeField(auto_now=True)),
-                ('collection', models.ForeignKey(to='draftin.Collection')),
+                ('collection', models.ForeignKey(to='draftin.Collection', on_delete=models.CASCADE)),
             ],
             options={
             },

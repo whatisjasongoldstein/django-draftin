@@ -21,7 +21,7 @@ from django.utils.text import slugify
 from django.utils.functional import cached_property
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.encoding import python_2_unicode_compatible
@@ -54,7 +54,8 @@ class Collection(models.Model):
     Webhook for Draft, which can be attached to another
     kind of content like a site or a blog.
     """
-    content_type = models.ForeignKey(ContentType, blank=True, null=True)
+    content_type = models.ForeignKey(ContentType, blank=True, null=True,
+        on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     parent = GenericForeignKey('content_type', 'object_id')
     name = models.CharField(max_length=255, default="")
@@ -94,11 +95,11 @@ class Publication(models.Model):
 
 @python_2_unicode_compatible
 class Draft(models.Model):
-    collection = models.ForeignKey(Collection)
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
     draft_id = models.IntegerField(blank=True, null=True, editable=False)
     external_url = models.URLField(blank=True, default="")
     publication = models.ForeignKey(Publication, blank=True, null=True,
-        verbose_name="External Publication")
+        verbose_name="External Publication", on_delete=models.SET_NULL)
     canonical_url = models.URLField(blank=True, default="")
     name = models.CharField("Title", max_length=512)
     description = models.TextField(blank=True, default="", help_text="Optional dek.")

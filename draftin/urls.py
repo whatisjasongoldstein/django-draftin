@@ -1,6 +1,6 @@
-from django.conf.urls import url
+from django.urls import re_path
 from .views import endpoint
 
 urlpatterns = [
-    url(r'^(?P<uuid>[-\w\d]+)/$', endpoint, name="draftin.endpoint"),
+    re_path(r'^(?P<uuid>[-\w\d]+)/$', endpoint, name="draftin.endpoint"),
 ]
