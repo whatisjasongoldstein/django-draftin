@@ -1,3 +1,8 @@
+
+**Deprecated.** Steal whatever ideas you like, but my plan is to roll the parts I still use into the main codebase of [whatisjasongoldstein.com](https://whatisjasongoldstein.com).
+
+-----
+
 A simple writing toolkit for Django. It can receive posts
 from [Draftin](https://draftin.com/), scrape Markdown (from something
 like Dropbox), or link to external posts on other blogs.
