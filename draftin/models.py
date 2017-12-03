@@ -220,7 +220,7 @@ class Draft(models.Model):
             # Resize image
             resize_image(file_path, DRAFTIN_SETTINGS["MAX_IMAGE_SIZE"])
 
-        self.content_html = lxml.html.tostring(tree)
+        self.content_html = lxml.html.tostring(tree, encoding="unicode")
 
     def download_gists(self):
         """
