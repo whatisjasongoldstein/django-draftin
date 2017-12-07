@@ -16,6 +16,7 @@ except ImportError:
 from PIL import Image
 
 from django.db import models
+from django.urls.exceptions import NoReverseMatch
 from django.utils.html import strip_tags
 from django.utils.text import slugify
 from django.utils.functional import cached_property
@@ -77,7 +78,11 @@ class Collection(models.Model):
         return super(Collection, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse("draftin.endpoint", kwargs={"uuid": self.uuid})
+        try:
+            return reverse("draftin.endpoint",
+                kwargs={"uuid": self.uuid})
+        except NoReverseMatch:
+            pass
 
 
 @python_2_unicode_compatible
